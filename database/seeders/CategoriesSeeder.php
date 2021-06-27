@@ -44,7 +44,7 @@ class CategoriesSeeder extends Seeder
         $category->literal_name = "cat_leisure";
         $category->descr = "Comidas fuera, restaurantes y todo lo relacionado con ocio";
         $category->literal_descr = "cat_descr_leisure";
-        $category->img = "fas fa-ticket-alt";
+        $category->img = "fas fa-cocktail";
         $category->save();
 
         $category = new Category();
@@ -84,7 +84,7 @@ class CategoriesSeeder extends Seeder
         $category->literal_name = "cat_subscriptions";
         $category->descr = "Suscripciones recurrentes en el tiempo como Netflix o Spotify.";
         $category->literal_descr = "cat_descr_subscriptions";
-        $category->img = "fas fa-music";
+        $category->img = "fab fa-spotify";
         $category->save();
 
         $category = new Category();
@@ -93,6 +93,14 @@ class CategoriesSeeder extends Seeder
         $category->descr = "El resto de gastos que no pueden incluirse en ninguna de las categorias anteriores.";
         $category->literal_descr = "cat_descr_other-expenses";
         $category->img = "fas fa-align-center";
+        $category->save();
+
+        $category = new Category();
+        $category->name = "Criptomonedas";
+        $category->literal_name = "cat_cripto";
+        $category->descr = "Compra de diferentes criptomonedas o NFTs.";
+        $category->literal_descr = "cat_descr_cripto";
+        $category->img = "fab fa-bitcoin";
         $category->save();
     }
 }

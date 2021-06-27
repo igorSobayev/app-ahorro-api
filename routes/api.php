@@ -1,8 +1,7 @@
 <?php
 
-use App\Models\User;
+
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,26 +19,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/login', function (Request $request) {
-    $data = $request->validate([
-        'email' => 'required|email',
-        'password' => 'required'
-    ]);
+Route::post('/login', [App\Http\Controllers\UserController::class, 'login']);
+Route::post('/register', [App\Http\Controllers\UserController::class, 'register']);
 
-    $user = User::where('email', $request->email)->first();
-        
-    if (!$user || !Hash::check($request->password, $user->password)) {
-        return response([
-            'message' => ['These credentials do not match our records.']
-        ], 404);
-    }
+Route::get('/all-categories', [App\Http\Controllers\CategoriesController::class, 'allCategories'])->middleware('auth:sanctum');
 
-    $token = $user->createToken('my-app-token')->plainTextToken;
-
-    $response = [
-        'user' => $user,
-        'token' => $token
-    ];
-
-    return response($response, 201);
-});
+// Operaciones
+Route::post('/add-transaction', [App\Http\Controllers\TransactionController::class, 'addTransaction'])->middleware('auth:sanctum');
+Route::get('/transactions-month', [App\Http\Controllers\TransactionController::class, 'getTransactionsMonth'])->middleware('auth:sanctum');
