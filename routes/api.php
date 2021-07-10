@@ -26,4 +26,9 @@ Route::get('/all-categories', [App\Http\Controllers\CategoriesController::class,
 
 // Operaciones
 Route::post('/add-transaction', [App\Http\Controllers\TransactionController::class, 'addTransaction'])->middleware('auth:sanctum');
+Route::post('/update-transaction', [App\Http\Controllers\TransactionController::class, 'updateTransaction'])->middleware('auth:sanctum');
+Route::post('/remove-transaction', [App\Http\Controllers\TransactionController::class, 'removeTransaction'])->middleware('auth:sanctum');
 Route::get('/transactions-month', [App\Http\Controllers\TransactionController::class, 'getTransactionsMonth'])->middleware('auth:sanctum');
+Route::get('/transactions-last-30-days', [App\Http\Controllers\TransactionController::class, 'getTransactionsLast30Days'])->middleware('auth:sanctum');
+Route::get('/transactions-all', [App\Http\Controllers\TransactionController::class, 'getAllTransactions'])->middleware('auth:sanctum');
+Route::get('/transaction-data-{id_transaction}', [App\Http\Controllers\TransactionController::class, 'getTransactionData'])->middleware('auth:sanctum');
