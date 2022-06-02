@@ -75,6 +75,7 @@ class TransactionController extends Controller
         )->leftJoin('categories', 'categories.id_category', '=', 'transactions.id_category')
             ->leftJoin('currencies', 'currencies.id_currency', '=', 'transactions.id_currency')
             ->where('transactions.id_user', $user->id_user)->whereMonth('transactions.created_at', Carbon::now()->month)
+            ->whereYear('transactions.created_at', Carbon::now()->year)
             ->orderBy('transactions.created_at', 'DESC')->get();
 
         return response(["data" => ["transactions" => $transactions]], 200);
@@ -181,12 +182,14 @@ class TransactionController extends Controller
             DB::raw('ROUND(SUM(quantity), 2) as quantity'),
             DB::raw("DATE_FORMAT(created_at, '%m/%d') as day"),
         )->where('id_user', $user->id_user)->whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('transactions.created_at', Carbon::now()->year)
             ->where('type_transaction', 'suma')->groupBy('day')->get();
 
         $transactions_gastos = Transaction::select(
             DB::raw('ROUND(SUM(quantity), 2) as quantity'),
             DB::raw("DATE_FORMAT(created_at, '%m/%d') as day"),
         )->where('id_user', $user->id_user)->whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('transactions.created_at', Carbon::now()->year)
             ->where('type_transaction', 'resta')->groupBy('day')->get();
 
         $transactions_todo = [];
