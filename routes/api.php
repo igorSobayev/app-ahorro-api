@@ -31,7 +31,11 @@ Route::post('/remove-transaction', [App\Http\Controllers\TransactionController::
 Route::get('/transactions-month', [App\Http\Controllers\TransactionController::class, 'getTransactionsMonth'])->middleware('auth:sanctum');
 Route::get('/transactions-last-30-days', [App\Http\Controllers\TransactionController::class, 'getTransactionsLast30Days'])->middleware('auth:sanctum');
 Route::get('/transactions-all', [App\Http\Controllers\TransactionController::class, 'getAllTransactions'])->middleware('auth:sanctum');
+Route::get('/transactions-all-year', [App\Http\Controllers\TransactionController::class, 'getAllTransactionsYear'])->middleware('auth:sanctum');
 Route::get('/transaction-data-{id_transaction}', [App\Http\Controllers\TransactionController::class, 'getTransactionData'])->middleware('auth:sanctum');
 
 // Charts
 Route::get('/transactions-chart-month', [App\Http\Controllers\TransactionController::class, 'getTransactionsDataChartMonth'])->middleware('auth:sanctum');
+Route::get('/transactions-chart-last-30-days', [App\Http\Controllers\TransactionController::class, 'getTransactionsDataChartLast30Days'])->middleware('auth:sanctum');
+Route::get('/transactions-chart-all-year', [App\Http\Controllers\TransactionController::class, 'getTransactionsDataChartYear'])->middleware('auth:sanctum');
+Route::get('/transactions-chart-all', [App\Http\Controllers\TransactionController::class, 'getTransactionsDataChartAll'])->middleware('auth:sanctum');

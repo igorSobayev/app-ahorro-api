@@ -128,6 +128,29 @@ class TransactionController extends Controller
         return response(["data" => ["transactions" => $transactions]], 200);
     }
 
+    public function getAllTransactionsYear(Request $request)
+    {
+
+        $user = $request->user();
+
+        $transactions = Transaction::select(
+            'subject',
+            'quantity',
+            'type_transaction',
+            'transactions.created_at',
+            'transactions.id_transaction',
+            'currencies.currency_icon',
+            'categories.name',
+            'categories.literal_name',
+            'categories.img'
+        )->leftJoin('categories', 'categories.id_category', '=', 'transactions.id_category')
+            ->leftJoin('currencies', 'currencies.id_currency', '=', 'transactions.id_currency')
+            ->where('transactions.id_user', $user->id_user)->whereYear('transactions.created_at', Carbon::now()->year)
+            ->orderBy('transactions.created_at', 'DESC')->get();
+
+        return response(["data" => ["transactions" => $transactions]], 200);
+    }
+
     public function getTransactionData(Request $request)
     {
         $user = $request->user();
@@ -150,6 +173,125 @@ class TransactionController extends Controller
     }
 
     public function getTransactionsDataChartMonth(Request $request)
+    {
+
+        $user = $request->user();
+
+        $transactions_ingresos = Transaction::select(
+            DB::raw('ROUND(SUM(quantity), 2) as quantity'),
+            DB::raw("DATE_FORMAT(created_at, '%m/%d') as day"),
+        )->where('id_user', $user->id_user)->whereMonth('created_at', Carbon::now()->month)
+            ->where('type_transaction', 'suma')->groupBy('day')->get();
+
+        $transactions_gastos = Transaction::select(
+            DB::raw('ROUND(SUM(quantity), 2) as quantity'),
+            DB::raw("DATE_FORMAT(created_at, '%m/%d') as day"),
+        )->where('id_user', $user->id_user)->whereMonth('created_at', Carbon::now()->month)
+            ->where('type_transaction', 'resta')->groupBy('day')->get();
+
+        $transactions_todo = [];
+        $transactions_gastos_copia =  unserialize(serialize($transactions_gastos));
+
+        // TODO falla el bucle cuando la transaccion que esta en suma, solo tiene esa operacion en ese dia, por lo tanto no la añade al array REVISAR
+        foreach ($transactions_gastos_copia as $transaction) {
+
+            foreach ($transactions_ingresos as $transaction_suma) {
+                if ($transaction->day === $transaction_suma->day) {
+                    $transaction->quantity = $transaction->quantity - $transaction_suma->quantity;
+                }
+            }
+
+            array_push($transactions_todo, $transaction);
+        }
+
+        return response(["data" => [
+            "transactions_todo" => $transactions_todo,
+            "transactions_ingresos" => $transactions_ingresos,
+            "transactions_gastos" => $transactions_gastos
+        ]], 200);
+    }
+
+    public function getTransactionsDataChartLast30Days(Request $request)
+    {
+
+        $user = $request->user();
+
+        $transactions_ingresos = Transaction::select(
+            DB::raw('ROUND(SUM(quantity), 2) as quantity'),
+            DB::raw("DATE_FORMAT(created_at, '%m/%d') as day"),
+        )->where('id_user', $user->id_user)->whereDate('created_at', '>', Carbon::now()->subDays(30))
+            ->where('type_transaction', 'suma')->groupBy('day')->orderBy('created_at', 'ASC')->get();
+
+        $transactions_gastos = Transaction::select(
+            DB::raw('ROUND(SUM(quantity), 2) as quantity'),
+            DB::raw("DATE_FORMAT(created_at, '%m/%d') as day"),
+        )->where('id_user', $user->id_user)->whereDate('created_at', '>', Carbon::now()->subDays(30))
+            ->where('type_transaction', 'resta')->groupBy('day')->orderBy('created_at', 'ASC')->get();
+
+        $transactions_todo = [];
+        $transactions_gastos_copia =  unserialize(serialize($transactions_gastos));
+
+        // TODO falla el bucle cuando la transaccion que esta en suma, solo tiene esa operacion en ese dia, por lo tanto no la añade al array REVISAR
+        foreach ($transactions_gastos_copia as $transaction) {
+
+            foreach ($transactions_ingresos as $transaction_suma) {
+                if ($transaction->day === $transaction_suma->day) {
+                    $transaction->quantity = $transaction->quantity - $transaction_suma->quantity;
+                }
+            }
+
+            array_push($transactions_todo, $transaction);
+        }
+
+        return response(["data" => [
+            "transactions_todo" => $transactions_todo,
+            "transactions_ingresos" => $transactions_ingresos,
+            "transactions_gastos" => $transactions_gastos
+        ]], 200);
+    }
+
+    // TODO
+    public function getTransactionsDataChartYear(Request $request)
+    {
+
+        $user = $request->user();
+
+        $transactions_ingresos = Transaction::select(
+            DB::raw('ROUND(SUM(quantity), 2) as quantity'),
+            DB::raw("DATE_FORMAT(created_at, '%d') as day"),
+        )->where('id_user', $user->id_user)->whereMonth('created_at', Carbon::now()->month)
+            ->where('type_transaction', 'suma')->groupBy('day')->get();
+
+        $transactions_gastos = Transaction::select(
+            DB::raw('ROUND(SUM(quantity), 2) as quantity'),
+            DB::raw("DATE_FORMAT(created_at, '%d') as day"),
+        )->where('id_user', $user->id_user)->whereMonth('created_at', Carbon::now()->month)
+            ->where('type_transaction', 'resta')->groupBy('day')->get();
+
+        $transactions_todo = [];
+        $transactions_gastos_copia =  unserialize(serialize($transactions_gastos));
+
+        // TODO falla el bucle cuando la transaccion que esta en suma, solo tiene esa operacion en ese dia, por lo tanto no la añade al array REVISAR
+        foreach ($transactions_gastos_copia as $transaction) {
+
+            foreach ($transactions_ingresos as $transaction_suma) {
+                if ($transaction->day === $transaction_suma->day) {
+                    $transaction->quantity = $transaction->quantity - $transaction_suma->quantity;
+                }
+            }
+
+            array_push($transactions_todo, $transaction);
+        }
+
+        return response(["data" => [
+            "transactions_todo" => $transactions_todo,
+            "transactions_ingresos" => $transactions_ingresos,
+            "transactions_gastos" => $transactions_gastos
+        ]], 200);
+    }
+
+    // TODO
+    public function getTransactionsDataChartAll(Request $request)
     {
 
         $user = $request->user();

@@ -17,7 +17,7 @@ class UserController extends Controller
             'password' => 'required'
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->where('status', true)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response([
